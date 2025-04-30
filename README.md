@@ -288,7 +288,7 @@ ggplot(wine_data, aes(x = quality, y = alcohol)) +
     ## Warning: Continuous x aesthetic
     ## ℹ did you forget `aes(group = ...)`?
 
-
+![Alcohol Content by Wine Quality](alcoholcontent.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 Hypothesis: Wines with higher alcohol content tend to have higher
 quality.
@@ -329,7 +329,7 @@ ggplot(wine_data, aes(x = quality, y = volatile.acidity)) +
 
     ## Warning: Continuous x aesthetic
     ## ℹ did you forget `aes(group = ...)`?
-
+![Volatile Acidity by Wine Quality](volatileacidity.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- --> \###
 Hypothesis: Wines with higher volatile acidity are rated lower in
 quality.
@@ -370,7 +370,7 @@ ggplot(wine_data, aes(x = quality, y = sulphates)) +
 
     ## Warning: Continuous x aesthetic
     ## ℹ did you forget `aes(group = ...)`?
-
+![Sulphates by Wine Quality](sulphates.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ### Hypothesis:
@@ -496,6 +496,8 @@ corrplot(cor(wine_data[sapply(wine_data, is.numeric)]), method = "color", type =
 
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
+![Correlation Heatmap of Wine Features](heatmap.png)
+
 ``` r
 # Simple linear model: Alcohol predicting Quality
 model <- lm(quality ~ alcohol, data = wine_data)
@@ -537,3 +539,4 @@ confirms that higher alcohol content is significantly associated with
 higher-rated wines. These findings align with real-world winemaking
 intuition: stronger wines often feel more full-bodied and complex,
 affecting perception of quality.
+
