@@ -288,7 +288,6 @@ ggplot(wine_data, aes(x = quality, y = alcohol)) +
     ## Warning: Continuous x aesthetic
     ## ℹ did you forget `aes(group = ...)`?
 
-![Alcohol Distribution Boxplot](alcdistribution.png)
 
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 Hypothesis: Wines with higher alcohol content tend to have higher
@@ -449,6 +448,7 @@ ggplot(wine_data, aes(x = alcohol)) +
 ```
 
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![Alcohol Distribution Boxplot](alcdistribution.png)
 
 ``` r
 # Check variance
