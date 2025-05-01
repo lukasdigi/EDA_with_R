@@ -277,9 +277,10 @@ round(correlations["quality", ], 2)
 # Question: Does alcohol content affect wine quality?
 
 ``` r
-library(ggplot2)
+# Convert quality to factor for proper boxplot grouping
+wine_data$quality <- as.factor(wine_data$quality)
 
-# Alcohol vs Quality
+# Recreate alcohol vs. quality boxplot
 ggplot(wine_data, aes(x = quality, y = alcohol)) +
   geom_boxplot() +
   labs(title = "Alcohol Content by Wine Quality", y = "Alcohol", x = "Quality")
