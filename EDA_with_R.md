@@ -274,6 +274,19 @@ round(correlations["quality", ], 2)
 
 # ——————————————————————————
 
+``` r
+library(ggplot2)
+# Convert quality to factor for proper boxplot grouping
+wine_data$quality <- as.factor(wine_data$quality)
+
+# Recreate alcohol vs. quality boxplot
+ggplot(wine_data, aes(x = quality, y = alcohol)) +
+  geom_boxplot() +
+  labs(title = "Alcohol Content by Wine Quality", y = "Alcohol", x = "Quality")
+```
+
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
 # Question: Does alcohol content affect wine quality?
 
 ``` r
@@ -285,10 +298,7 @@ ggplot(wine_data, aes(x = quality, y = alcohol)) +
   labs(title = "Alcohol Content by Wine Quality", y = "Alcohol", x = "Quality")
 ```
 
-    ## Warning: Continuous x aesthetic
-    ## ℹ did you forget `aes(group = ...)`?
-
-![](EDA_with_R_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 Hypothesis: Wines with higher alcohol content tend to have higher
 quality.
 
@@ -326,10 +336,7 @@ ggplot(wine_data, aes(x = quality, y = volatile.acidity)) +
   labs(title = "Volatile Acidity by Wine Quality", y = "Volatile Acidity", x = "Quality")
 ```
 
-    ## Warning: Continuous x aesthetic
-    ## ℹ did you forget `aes(group = ...)`?
-
-![](EDA_with_R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- --> \###
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> \###
 Hypothesis: Wines with higher volatile acidity are rated lower in
 quality.
 
@@ -367,10 +374,7 @@ ggplot(wine_data, aes(x = quality, y = sulphates)) +
   labs(title = "Sulphates by Wine Quality", y = "Sulphates", x = "Quality")
 ```
 
-    ## Warning: Continuous x aesthetic
-    ## ℹ did you forget `aes(group = ...)`?
-
-![](EDA_with_R_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ### Hypothesis:
 
@@ -403,10 +407,22 @@ marginal in comparison to other chemical properties like alcohol..
 # ——————————————————————————
 
 ``` r
+# Ensure 'quality' is numeric before comparison
+wine_data$quality <- as.numeric(as.character(wine_data$quality))
+
 # Grouping wine into high vs low quality
 wine_data$quality_group <- ifelse(wine_data$quality >= 7, "high", "low")
 
-# t-test for alcohol
+# Confirm it worked (optional but helpful)
+table(wine_data$quality_group)
+```
+
+    ## 
+    ## high  low 
+    ## 1277 5220
+
+``` r
+# Run Welch's t-test for alcohol across the two quality groups
 t.test(alcohol ~ quality_group, data = wine_data)
 ```
 
@@ -422,6 +438,79 @@ t.test(alcohol ~ quality_group, data = wine_data)
     ## mean in group high  mean in group low 
     ##           11.43336           10.26146
 
+## Assumptions
+
+### Normality
+
+``` r
+set.seed(42)
+sample_high <- sample(wine_data$alcohol[wine_data$quality_group == "high"], size = 500)
+sample_low  <- sample(wine_data$alcohol[wine_data$quality_group == "low"], size = 500)
+
+shapiro.test(sample_high)
+```
+
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  sample_high
+    ## W = 0.97254, p-value = 4.541e-08
+
+``` r
+shapiro.test(sample_low)
+```
+
+    ## 
+    ##  Shapiro-Wilk normality test
+    ## 
+    ## data:  sample_low
+    ## W = 0.95831, p-value = 1.092e-10
+
+#### Results
+
+- Shapiro-Wilk tests for normality yielded significant p-values for both
+  high- and low-quality wine groups, indicating departures from perfect
+  normality. However, due to the large sample sizes and the t-test’s
+  robustness to normality violations, especially under Welch’s
+  correction, the test results are considered valid.
+
+### Equality of Variances
+
+``` r
+library(car)
+```
+
+    ## Loading required package: carData
+
+``` r
+leveneTest(alcohol ~ quality_group, data = wine_data)
+```
+
+    ## Warning in leveneTest.default(y = y, group = group, ...): group coerced to
+    ## factor.
+
+    ## Levene's Test for Homogeneity of Variance (center = median)
+    ##         Df F value    Pr(>F)    
+    ## group    1  36.256 1.824e-09 ***
+    ##       6495                      
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+#### Results
+
+- Levene’s test for homogeneity of variance yielded a highly significant
+  result (F = 36.26, p \< 0.001), indicating unequal variances between
+  high- and low-quality wine groups. This supports the use of Welch’s
+  t-test, which does not assume equal variances.
+
+### Interpretation
+
+- Normality tests indicate deviations in both groups, but Welch’s t-test
+  is robust under large sample sizes. Levene’s test confirms unequal
+  variances, further validating the choice of Welch’s t-test.
+  Independence is assumed based on data collection. Therefore, the
+  assumptions necessary for valid inference are sufficiently met.
+
 ## Hypothesis: Mean alcohol content is higher in high-quality wines.
 
 ### Assumptions:
@@ -431,6 +520,16 @@ t.test(alcohol ~ quality_group, data = wine_data)
 - Variances may differ; Welch’s t-test handles this Interpretation: If
   p-value \< 0.05, alcohol is significantly different between high and
   low quality groups, supporting our hypothesis.
+
+### Result
+
+- There is a statistically significant difference in alcohol content
+  between high- and low-quality wines (p \< 2.2e-16). On average,
+  high-quality wines have an alcohol content of 11.43%, compared to
+  10.26% in low-quality wines — a mean difference of ~1.17%, with a 95%
+  confidence interval of \[1.10%, 1.24%\]. These findings support the
+  hypothesis that higher alcohol content is associated with better wine
+  quality.
 
 # ——————————————————————————
 
@@ -446,16 +545,11 @@ ggplot(wine_data, aes(x = alcohol)) +
   labs(title = "Alcohol Distribution by Quality Group")
 ```
 
-![](EDA_with_R_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 # Check variance
 library(car)
-```
-
-    ## Loading required package: carData
-
-``` r
 leveneTest(alcohol ~ quality_group, data = wine_data)
 ```
 
@@ -492,7 +586,7 @@ library(corrplot)
 corrplot(cor(wine_data[sapply(wine_data, is.numeric)]), method = "color", type = "upper")
 ```
 
-![](EDA_with_R_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 # Simple linear model: Alcohol predicting Quality
@@ -526,6 +620,230 @@ Sulphates and citric acid show weaker positive correlations. Density is
 negatively correlated with quality. Alcohol is the most promising
 predictor for wine quality.
 
+# Simple linear model: Alcohol predicting Quality
+
+``` r
+wine_data$quality <- as.numeric(as.character(wine_data$quality))  # safely convert factor to numeric
+model <- lm(quality ~ alcohol, data = wine_data)
+summary(model)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = quality ~ alcohol, data = wine_data)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.5042 -0.4957 -0.0488  0.5043  3.2115 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 2.405269   0.085941   27.99   <2e-16 ***
+    ## alcohol     0.325312   0.008139   39.97   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.7824 on 6495 degrees of freedom
+    ## Multiple R-squared:  0.1974, Adjusted R-squared:  0.1973 
+    ## F-statistic:  1598 on 1 and 6495 DF,  p-value: < 2.2e-16
+
+## Checkiing Assumptions
+
+### Linearity
+
+#### Residuals vs Fitted
+
+``` r
+plot(model, which = 1)  # Residuals vs Fitted
+```
+
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+#### Results
+
+- There is slight curviture, but it maintains a mostly flat loess line.
+- The residuals appear evenly distributed around 0.
+- Minor structure due to discrete quality scores, but does not violate
+  linearity.
+
+## Normality
+
+### Q-Q Plot
+
+``` r
+# Q-Q plot to visually assess normality
+plot(model, which = 2)
+```
+
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+#### Results
+
+- The Q-Q plot shows that residuals are approximately normal in the
+  central range, with moderate deviations in the tails. Given the large
+  sample size, these deviations are not severe enough to violate the
+  normality assumption for inference purposes.
+
+\##Independence of Residuals
+
+``` r
+library(lmtest)
+```
+
+    ## Loading required package: zoo
+
+    ## 
+    ## Attaching package: 'zoo'
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     as.Date, as.Date.numeric
+
+``` r
+dwtest(model)  # Durbin-Watson test
+```
+
+    ## 
+    ##  Durbin-Watson test
+    ## 
+    ## data:  model
+    ## DW = 1.6361, p-value < 2.2e-16
+    ## alternative hypothesis: true autocorrelation is greater than 0
+
+#### Results
+
+- The Durbin-Watson test yielded a statistic of 1.63 with a p-value \<
+  2.2e-16, indicating significant positive autocorrelation in the
+  residuals. This suggests that the assumption of independent errors is
+  violated, which may be due to omitted variables or structure in the
+  data. While the core trend between alcohol and quality remains
+  informative, this limitation should be noted when interpreting the
+  model’s inference results.
+
+``` r
+plot(model, which = 4)  # Cook’s distance
+```
+
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+#### Results
+
+- Cook’s Distance was calculated to assess influential observations.
+  While a few data points (e.g., obs 653, 2340, and 5501) exhibited
+  relatively higher influence, all values remained well below the common
+  threshold of 0.5, indicating no strong outliers affecting the model.
+
+# Multiple Linear Regression
+
+``` r
+# Fit improved multiple regression model with polynomial, interaction, and extra predictors
+model_improved <- lm(
+  quality ~ poly(alcohol, 2) * sulphates +
+    volatile.acidity +
+    citric.acid +
+    color +
+    fixed.acidity +
+    residual.sugar +
+    pH +
+    density +
+    free.sulfur.dioxide +
+    total.sulfur.dioxide +
+    chlorides,
+  data = wine_data
+)
+
+# View summary
+summary(model_improved)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = quality ~ poly(alcohol, 2) * sulphates + volatile.acidity + 
+    ##     citric.acid + color + fixed.acidity + residual.sugar + pH + 
+    ##     density + free.sulfur.dioxide + total.sulfur.dioxide + chlorides, 
+    ##     data = wine_data)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.7339 -0.4795 -0.0226  0.4457  3.0706 
+    ## 
+    ## Coefficients:
+    ##                               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                  1.111e+02  1.417e+01   7.839 5.26e-15 ***
+    ## poly(alcohol, 2)1            1.679e+01  3.347e+00   5.016 5.43e-07 ***
+    ## poly(alcohol, 2)2            1.365e+01  2.627e+00   5.194 2.12e-07 ***
+    ## sulphates                    7.318e-01  7.619e-02   9.605  < 2e-16 ***
+    ## volatile.acidity            -1.516e+00  8.197e-02 -18.490  < 2e-16 ***
+    ## citric.acid                 -1.078e-01  7.991e-02  -1.349   0.1775    
+    ## colorwhite                  -3.450e-01  5.677e-02  -6.078 1.29e-09 ***
+    ## fixed.acidity                9.601e-02  1.593e-02   6.028 1.75e-09 ***
+    ## residual.sugar               6.186e-02  6.031e-03  10.257  < 2e-16 ***
+    ## pH                           5.520e-01  9.089e-02   6.074 1.32e-09 ***
+    ## density                     -1.082e+02  1.454e+01  -7.441 1.12e-13 ***
+    ## free.sulfur.dioxide          4.724e-03  7.671e-04   6.158 7.80e-10 ***
+    ## total.sulfur.dioxide        -1.376e-03  3.246e-04  -4.240 2.26e-05 ***
+    ## chlorides                   -5.949e-01  3.435e-01  -1.732   0.0834 .  
+    ## poly(alcohol, 2)1:sulphates  8.008e+00  5.132e+00   1.560   0.1187    
+    ## poly(alcohol, 2)2:sulphates -1.956e+01  4.703e+00  -4.159 3.24e-05 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.7313 on 6481 degrees of freedom
+    ## Multiple R-squared:  0.3003, Adjusted R-squared:  0.2987 
+    ## F-statistic: 185.5 on 15 and 6481 DF,  p-value: < 2.2e-16
+
+## Assumptions
+
+### Linearity
+
+``` r
+# 1. Residual plot for linearity + homoscedasticity
+plot(model_improved, which = 1)
+```
+
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+#### Results
+
+- This returns a flatter loess line, indicating improved linearity.
+
+### Normality
+
+``` r
+plot(model_improved, which = 2)
+```
+
+![](EDA_with_R_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+#### Results
+
+- The model still meets the normality assumption, although there are
+  slight skews on the edges.
+
+### Autocorrelation
+
+``` r
+library(lmtest)
+dwtest(model_improved)
+```
+
+    ## 
+    ##  Durbin-Watson test
+    ## 
+    ## data:  model_improved
+    ## DW = 1.6469, p-value < 2.2e-16
+    ## alternative hypothesis: true autocorrelation is greater than 0
+
+#### Results
+
+- The improved regression model explained more variance in wine quality
+  and included polynomial and interaction terms. However, the
+  Durbin-Watson test (DW = 1.65, p \< 0.001) still indicated residual
+  autocorrelation. This suggests that there may be latent structure in
+  the data not captured by the available predictors, or that linear
+  regression may not fully reflect the ordinal nature of wine quality
+  scores.
+
 ## Conclusions
 
 Based on our EDA, we observed that alcohol and sulphates are positively
@@ -534,4 +852,10 @@ correlation. Statistical testing (t-tests and linear regression)
 confirms that higher alcohol content is significantly associated with
 higher-rated wines. These findings align with real-world winemaking
 intuition: stronger wines often feel more full-bodied and complex,
-affecting perception of quality.
+affecting perception of quality. While there are some issues with the
+assumptions of the statistical tests, running several tests of varying
+complexities proved difficult. Both models yield similar DW statistics
+because the autocorrelation issue is likely due to unobserved grouping
+or time effects that aren’t captured by your predictors. Since those
+structural factors aren’t included in the dataset, the pattern in
+residuals remains the same — even in more complex models.
