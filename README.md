@@ -638,7 +638,7 @@ summary(model)
     ## Multiple R-squared:  0.1974, Adjusted R-squared:  0.1973 
     ## F-statistic:  1598 on 1 and 6495 DF,  p-value: < 2.2e-16
 
-## Checkiing Assumptions
+## Checking Assumptions
 
 ### Linearity
 
@@ -803,7 +803,7 @@ plot(model_improved, which = 1)
 ``` r
 plot(model_improved, which = 2)
 ```
-![Q-Q Plot (Improved)](q-qresiduals1.png)
+![Q-Q Plot (Final Improved)](qqresiduals3.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 #### Results
