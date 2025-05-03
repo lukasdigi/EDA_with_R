@@ -284,21 +284,11 @@ ggplot(wine_data, aes(x = quality, y = alcohol)) +
   geom_boxplot() +
   labs(title = "Alcohol Content by Wine Quality", y = "Alcohol", x = "Quality")
 ```
-
+![Alcohol Content Boxplot](alcoholcontent.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 # Question: Does alcohol content affect wine quality?
 
-``` r
-library(ggplot2)
-
-# Alcohol vs Quality
-ggplot(wine_data, aes(x = quality, y = alcohol)) +
-  geom_boxplot() +
-  labs(title = "Alcohol Content by Wine Quality", y = "Alcohol", x = "Quality")
-```
-![Alcohol Content by Wine Quality](alcoholcontent.png)
-![](EDA_with_R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 Hypothesis: Wines with higher alcohol content tend to have higher
 quality.
 
@@ -335,7 +325,7 @@ ggplot(wine_data, aes(x = quality, y = volatile.acidity)) +
   geom_boxplot() +
   labs(title = "Volatile Acidity by Wine Quality", y = "Volatile Acidity", x = "Quality")
 ```
-
+![Volatile Acidity Plot](volatileacidity.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> \###
 Hypothesis: Wines with higher volatile acidity are rated lower in
 quality.
@@ -657,7 +647,7 @@ summary(model)
 ``` r
 plot(model, which = 1)  # Residuals vs Fitted
 ```
-
+![Residuals vs Fitted (Simple)](residualsvsfitted.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 #### Results
@@ -675,7 +665,7 @@ plot(model, which = 1)  # Residuals vs Fitted
 # Q-Q plot to visually assess normality
 plot(model, which = 2)
 ```
-
+![Q-Q Plot (Simple)](Q-Qresiduals.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 #### Results
@@ -724,7 +714,7 @@ dwtest(model)  # Durbin-Watson test
 ``` r
 plot(model, which = 4)  # Cook’s distance
 ```
-
+![Cook’s Distance](cooks.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 #### Results
@@ -801,7 +791,7 @@ summary(model_improved)
 # 1. Residual plot for linearity + homoscedasticity
 plot(model_improved, which = 1)
 ```
-
+![Residuals vs Fitted (Improved)](residualsvsfitted2.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 #### Results
@@ -813,7 +803,7 @@ plot(model_improved, which = 1)
 ``` r
 plot(model_improved, which = 2)
 ```
-
+![Q-Q Plot (Improved)](q-qresiduals1.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 #### Results
