@@ -297,7 +297,7 @@ ggplot(wine_data, aes(x = quality, y = alcohol)) +
   geom_boxplot() +
   labs(title = "Alcohol Content by Wine Quality", y = "Alcohol", x = "Quality")
 ```
-
+![Alcohol Content by Wine Quality](alcoholcontent.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 Hypothesis: Wines with higher alcohol content tend to have higher
 quality.
@@ -544,6 +544,7 @@ ggplot(wine_data, aes(x = alcohol)) +
   facet_wrap(~ quality_group) +
   labs(title = "Alcohol Distribution by Quality Group")
 ```
+![Alcohol Distribution by Quality Group](alcdistribution.png) v
 
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
