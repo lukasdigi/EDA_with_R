@@ -373,7 +373,7 @@ ggplot(wine_data, aes(x = quality, y = sulphates)) +
   geom_boxplot() +
   labs(title = "Sulphates by Wine Quality", y = "Sulphates", x = "Quality")
 ```
-
+![Sulphates by Wine Quality](sulphates.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ### Hypothesis:
@@ -586,7 +586,7 @@ library(corrplot)
 ``` r
 corrplot(cor(wine_data[sapply(wine_data, is.numeric)]), method = "color", type = "upper")
 ```
-
+![Correlation Heatmap of Wine Features](heatmap.png)
 ![](EDA_with_R_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
