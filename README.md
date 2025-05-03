@@ -524,6 +524,28 @@ summary(model)
     ## Multiple R-squared:  0.1974, Adjusted R-squared:  0.1973 
     ## F-statistic:  1598 on 1 and 6495 DF,  p-value: < 2.2e-16
 
+```{r}
+plot(model, which = 1)  # Residuals vs Fitted
+```
+
+```{r}
+plot(model, which = 2)  # Q-Q plot
+shapiro.test(residuals(model))  # Formal normality test
+
+```
+
+```{r}
+library(lmtest)
+dwtest(model)  # Durbin-Watson test
+
+
+```
+
+```{r}
+plot(model, which = 4)  # Cook’s distance
+
+```
+
 ## Interpretation:
 
 Alcohol shows the strongest positive correlation with quality (~0.45).
